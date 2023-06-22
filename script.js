@@ -1,50 +1,162 @@
-const add = function(...nums) {
-	let result = 0;
-  for (let i=0; i<nums.length; i++) {
-    result += nums[i]; 
-  }
-  return result;
-};
+var numberButtons = document.getElementsByClassName("number");
+var operatorButtons = document.getElementsByClassName("operator");
+var equalsButton = document.getElementById("button-equals");
+var clearButton = document.getElementById("button-clear");
+var backspaceButton = document.getElementById("button-backspace");
+var screen = document.getElementById("screen");
 
-const subtract = function(...nums) {
-	let result = nums[0];
-  for (let i=1; i<nums.length; i++) {
-    result -= nums[i]; 
-  }
-  return result;
-};
+var firstNums = 0;
+var secondNums = 0;
+var currentNums = [];
+var operator = "";
+var decimalPressed = false;
 
-const sum = function(nums) {
-  let result = 0;
-  for (let i = 0; i < nums.length; i++) {
-    if (typeof nums[i] === 'number' && !isNaN(nums[i])) {
-      result += nums[i];
+function convertToNumber() {
+  var numStr = currentNums.join("");
+  return decimalPressed ? parseFloat(numStr) : parseInt(numStr);
+}
+
+function calculateResult() {
+  switch (operator) {
+    case "+":
+      return firstNums + secondNums;
+    case "−":
+      return firstNums - secondNums;
+    case "×":
+    case "*":
+      return firstNums * secondNums;
+    case "÷":
+    case "/":
+      return firstNums / secondNums;
+    default:
+      return 0;
+  }
+}
+
+function updateScreen() {
+  var screenContent = "";
+  
+  screenContent += firstNums || "";
+  screenContent += operator ? " " + operator + " " : "";
+  screenContent += secondNums || "";
+  screenContent += currentNums.length !== 0 ? currentNums.join("") : "";
+  
+  screen.textContent = screenContent;
+}
+
+
+Array.from(numberButtons).forEach(function(button) {
+  button.addEventListener("click", function() {
+    var num = this.textContent;
+    if (!isNaN(parseFloat(num))) {
+      currentNums.push(parseFloat(num));
+      updateScreen();
+    } else if (num === "." && !decimalPressed) {
+      currentNums.push(".");
+      decimalPressed = true;
+      updateScreen();
     }
-  }
-  return result;
-};
+  });
+});
 
 
-const multiply = function(...nums) {
-	let result = nums[0];
-  for (let i=1; i<nums.length; i++) {
-    result *= nums[i]; 
+document.getElementById("button-point").addEventListener("click", function() {
+  if (!decimalPressed) {
+    currentNums.push(".");
+    decimalPressed = true;
+    updateScreen();
   }
-  return result;
-};
+});
 
-const power = function(...nums) {
-  let result = 1;
-  for (let i=0; i<nums[1]; i++) {
-    result *= nums[0]; 
-  }
-  return result;
-};
+Array.from(operatorButtons).forEach(function(button) {
+  button.addEventListener("click", function() {
+    if (currentNums.length > 0) {
+      operator = this.textContent.trim();
+      firstNums = convertToNumber();
+      currentNums = [];
+      decimalPressed = false;
+      updateScreen();
+    }
+  });
+});
 
-const factorial = function(num) {
-  let result = 1;
-  for (let i=1; i<=num; i++) {
-    result *= i; 
+
+clearButton.addEventListener("click", function() {
+  firstNums = 0;
+  secondNums = 0;
+  currentNums = [];
+  operator = "";
+  decimalPressed = false;
+  updateScreen();
+});
+
+backspaceButton.addEventListener("click", function() {
+  currentNums.pop();
+  updateScreen();
+});
+
+equalsButton.addEventListener("click", function() {
+  secondNums = convertToNumber();
+  var result = calculateResult();
+  firstNums = 0;
+  secondNums = 0;
+  currentNums = [];
+  operator = "";
+  decimalPressed = false;
+  screen.textContent = result;
+});
+
+document.addEventListener("keydown", function(event) {
+  var key = event.key;
+  switch (key) {
+    case "Enter":
+      if (currentNums.length > 0) {
+        secondNums = convertToNumber();
+        var result = calculateResult();
+        firstNums = 0;
+        secondNums = 0;
+        currentNums = [];
+        operator = "";
+        decimalPressed = false;
+        screen.textContent = result;
+      }
+      break;
+    case "Backspace":
+      currentNums.pop();
+      updateScreen();
+      break;
+    case "Delete":
+      firstNums = 0;
+      secondNums = 0;
+      currentNums = [];
+      operator = "";
+      decimalPressed = false;
+      updateScreen();
+      break;
+    case "+":
+    case "-":
+    case "*":
+    case "/":
+      operator = key;
+      firstNums = convertToNumber();
+      currentNums = [];
+      decimalPressed = false;
+      updateScreen();
+      break;
+    default:
+      if (!isNaN(parseFloat(key))) {
+        currentNums.push(parseFloat(key));
+        updateScreen();
+      } else if (key === ".") {
+        if (!decimalPressed) {
+          currentNums.push(".");
+          decimalPressed = true;
+          updateScreen();
+        }
+      }
+      break;
   }
-  return result;
-};
+});
+
+
+updateScreen();
