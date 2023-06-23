@@ -1,5 +1,5 @@
 body {
-  font-family: Arial, sans-serif;
+  font-family: monospace;
   background-color: #d8d8d8;
   margin: 0;
   padding: 0;
@@ -37,9 +37,9 @@ main {
   height: 80px;
   border-radius: 29px;
   padding: 21px;
-  text-align: right;
+  align-items:center;
   margin-bottom: 20px;
-  font-size: 30px;
+  font-size: 32px;
   color: #d8d8d8;
 }
 
