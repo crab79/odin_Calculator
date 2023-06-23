@@ -24,6 +24,9 @@ function multiply(num1, num2) {
 }
 
 function divide(num1, num2) {
+  if (num2 === 0) {
+    throw new Error("Oops! You divided by zero!");
+  }
   return num1 / num2;
 }
 
@@ -83,16 +86,24 @@ function handleOperatorButtonClick(clickedValue) {
 
 function handleEqualsButtonClick() {
   if (firstNum !== '' && secondNum !== '') {
-    const result = operate(operator.trim(), parseFloat(firstNum), parseFloat(secondNum));
-    if (result === 'Error') {
-      screen.textContent = 'Error';
-    } else {
-      screen.textContent = result;
+    try {
+      const result = operate(operator.trim(), parseFloat(firstNum), parseFloat(secondNum));
+      if (isNaN(result)) {
+        screen.textContent = "Oops! Something went wrong.";
+      } else {
+        screen.textContent = result;
+      }
+      firstNum = result.toString();
+      secondNum = '';
+      operator = '';
+      hasDecimal = false; // Resetting the flag
+    } catch (error) {
+      screen.textContent = error.message;
+      firstNum = '';
+      secondNum = '';
+      operator = '';
+      hasDecimal = false; // Resetting the flag
     }
-    firstNum = result.toString();
-    secondNum = '';
-    operator = '';
-    hasDecimal = false; // Resetting the flag
   }
 }
 
@@ -141,7 +152,7 @@ function handleKeyboardInput(event) {
     handleDotButtonClick();
   } else if (key === '+' || key === '-' || key === '*' || key === '/') {
     handleOperatorButtonClick(key);
-  } else if (key === 'Enter') {
+  } else if (key === 'Enter' || key === '=') {
     handleEqualsButtonClick();
   } else if (key === 'Backspace') {
     handleBackspaceButtonClick();
